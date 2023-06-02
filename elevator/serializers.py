@@ -5,8 +5,9 @@ from .models import *
 class ElevatorSerializer(serializers.ModelSerializer):
     direction = serializers.SerializerMethodField()
     status = serializers.SerializerMethodField()
-    is_running = serializers.BooleanField(read_only=True)
-    is_door_open = serializers.BooleanField(read_only=True)
+    is_running = serializers.BooleanField(required=False)
+    is_door_open = serializers.BooleanField(required=False)
+    is_working = serializers.BooleanField(required=False)
 
     def get_direction(self, obj):
         if obj.is_running:
@@ -24,7 +25,8 @@ class ElevatorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Elevator
-        fields = ['id', 'elevator_number', 'current_floor', 'destination_floor', 'direction', 'status', 'is_running', 'is_door_open']
+        fields = ['id', 'elevator_number', 'current_floor', 'destination_floor', 'direction', 'status', 'is_running', 'is_door_open', 'is_working']
+
 
 class ElevatorSystemSerializer(serializers.ModelSerializer):
     class Meta:

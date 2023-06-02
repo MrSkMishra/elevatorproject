@@ -59,6 +59,8 @@ class ElevatorViewSet(viewsets.ModelViewSet):
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
+
+
 # class ElevatorViewSet(viewsets.ModelViewSet):
 #     queryset = Elevator.objects.all()
 #     serializer_class = ElevatorSerializer
@@ -99,3 +101,64 @@ class ElevatorViewSet(viewsets.ModelViewSet):
 
 
 
+
+
+class ElevatorSystemViewSet(APIView):
+    def get(self, request, format=None):
+        elevator_systems = ElevatorSystem.objects.all()
+        serializer = ElevatorSystemSerializer(elevator_systems, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, format=None):
+        serializer = ElevatorSystemSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ElevatorAssignmentViewSet(viewsets.ViewSet):
+    def list(self, request):
+        assignments = ElevatorAssignment.objects.all()
+        serializer = ElevatorAssignmentSerializer(assignments, many=True)
+        return Response(serializer.data)
+
+    def retrieve(self, request, pk=None):
+        assignment = ElevatorAssignment.objects.get(pk=pk)
+        serializer = ElevatorAssignmentSerializer(assignment)
+        return Response(serializer.data)
+
+    def create(self, request):
+        serializer = ElevatorAssignmentSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
+
+    def update(self, request, pk=None):
+        assignment = ElevatorAssignment.objects.get(pk=pk)
+        serializer = ElevatorAssignmentSerializer(assignment, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
+
+
+class ElevatorStatusViewSet(viewsets.ViewSet):
+    def retrieve(self, request, elevator_id):
+        try:
+            elevator = Elevator.objects.get(id=elevator_id)
+            serializer = ElevatorStatusSerializer(elevator)
+            return Response(serializer.data)
+        except Elevator.DoesNotExist:
+            return Response({"detail": "Elevator not found."}, status=404)
+
+
+class NextDestinationFloorViewSet(viewsets.ViewSet):
+    def retrieve(self, request, elevator_id):
+        try:
+            elevator = Elevator.objects.get(id=elevator_id)
+            serializer = NextDestinationFloorSerializer(elevator)
+            return Response(serializer.data)
+        except Elevator.DoesNotExist:
+            return Response({"detail": "Elevator not found."}, status=404)
